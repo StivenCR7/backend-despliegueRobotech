@@ -50,7 +50,7 @@ public class WebSecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(Arrays.asList("http://localhost:5173")); // Ajusta esto según tu entorno
+        config.setAllowedOrigins(Arrays.asList("https://thankful-ground-024179f0f.4.azurestaticapps.net")); // Ajusta esto según tu entorno
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         source.registerCorsConfiguration("/**", config);
