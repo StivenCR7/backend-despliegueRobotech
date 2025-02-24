@@ -98,6 +98,12 @@
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
 		</dependency>
+		<!-- librería de Azure Storage -->
+		<dependency>
+			<groupId>com.azure</groupId>
+			<artifactId>azure-storage-blob</artifactId>
+			<version>12.14.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
