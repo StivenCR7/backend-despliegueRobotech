@@ -37,6 +37,9 @@ public class CompetidorController {
 	@Autowired
 	private ClubesRepository clubesRepository;
 
+	@Autowired
+	private CompetidorRepository competidoresRepository;
+
 	@GetMapping("/listar")
 	public List<Competidores> listarCompetidores() {
 		return competidorService.obtenerTodosLosCompetidores();
@@ -77,6 +80,13 @@ public class CompetidorController {
 	    // Validar que el correo no esté vacío
 	    if (competidores.getCorreo() == null || competidores.getCorreo().isEmpty()) {
 	        return ResponseEntity.badRequest().body("{\"error\": \"Correo Electrónico no puede estar vacío!\"}");
+	    }
+	    
+	    // Validar que el alias sea único
+	    // Suponiendo que tienes un método en el repositorio: findByAlias(String alias)
+	    Competidores aliasExistente = competidoresRepository.findByAlias(competidores.getAlias());
+	    if (aliasExistente != null) {
+	        return ResponseEntity.badRequest().body("{\"error\": \"El alias ya está en uso. Por favor, elige otro.\"}");
 	    }
 
 	    // Asignar el estado predeterminado
