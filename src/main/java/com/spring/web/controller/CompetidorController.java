@@ -1,7 +1,6 @@
  package com.spring.web.controller;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +16,7 @@ import com.spring.web.model.Clubes;
 import com.spring.web.model.Competidores;
 import com.spring.web.model.Estados;
 import com.spring.web.repository.ClubesRepository;
+import com.spring.web.repository.CompetidorRepository;
 import com.spring.web.repository.EstadosRepository;
 import com.spring.web.security.SecurityConfig;
 import com.spring.web.services.CompetidorServices;
@@ -36,7 +36,7 @@ public class CompetidorController {
 
 	@Autowired
 	private ClubesRepository clubesRepository;
-
+	
 	@Autowired
 	private CompetidorRepository competidoresRepository;
 
