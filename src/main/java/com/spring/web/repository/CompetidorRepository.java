@@ -7,4 +7,5 @@ import com.spring.web.model.Competidores;
 
 public interface CompetidorRepository extends JpaRepository<Competidores, Integer> {
 	Competidores findByDni(String dni);
+	Competidores findByAlias(String alias);
 }
