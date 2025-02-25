@@ -48,8 +48,6 @@ public class NoticiaController {
         return noticias;
     }
 
-
-
     @GetMapping("/obtener/{id}")
     public ResponseEntity<Noticias> obtenerNoticiaPorId(@PathVariable Long id) {
         return noticiaService.obtenerNoticiaPorId(id)
