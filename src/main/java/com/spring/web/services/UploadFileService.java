@@ -1,18 +1,22 @@
 package com.spring.web.services;
 
 import com.azure.storage.blob.*;
+import com.azure.storage.blob.models.*;
+import com.azure.storage.blob.sas.*;
+import com.azure.storage.common.sas.SasProtocol;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
-@Service 
+@Service
 public class UploadFileService {
-	
-	
-	private final BlobServiceClient blobServiceClient;
+
+    private final BlobServiceClient blobServiceClient;
     private final String containerName;
 
     public UploadFileService(@Value("${azure.storage.connection-string}") String connectionString,
@@ -36,12 +40,11 @@ public class UploadFileService {
             BlobClient blobClient = containerClient.getBlobClient(fileName);
 
             try (InputStream dataStream = file.getInputStream()) {
-                // El tercer parámetro 'true' indica que se sobrescribe si existe
                 blobClient.upload(dataStream, file.getSize(), true);
             }
 
-            // Retorna la URL del blob subido, que puedes usar en el front
-            return blobClient.getBlobUrl();
+            // Generar y devolver la URL con un SAS token válido por 2 semanas
+            return generateSasToken(blobClient);
         }
         return "default.jpg";
     }
@@ -53,5 +56,22 @@ public class UploadFileService {
             blobClient.delete();
         }
     }
-	
+
+    private String generateSasToken(BlobClient blobClient) {
+        // Definir permisos para el SAS (solo lectura)
+        BlobSasPermission sasPermission = new BlobSasPermission().setReadPermission(true);
+
+        // Establecer tiempo de expiración (2 semanas desde ahora)
+        OffsetDateTime expiryTime = OffsetDateTime.now().plusWeeks(2);
+
+        // Construir el SAS token
+        BlobServiceSasSignatureValues sasValues = new BlobServiceSasSignatureValues(expiryTime, sasPermission)
+                .setProtocol(SasProtocol.HTTPS_ONLY);
+
+        // Generar el SAS token
+        String sasToken = blobClient.generateSas(sasValues);
+
+        // Devolver la URL con el SAS token
+        return blobClient.getBlobUrl() + "?" + sasToken;
+    }
 }
