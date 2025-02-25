@@ -19,6 +19,7 @@ public class UploadFileService {
 
     public UploadFileService(@Value("${azure.storage.connection-string}") String connectionString,
                              @Value("${azure.storage.container-name}") String containerName) {
+        System.out.println("Inicializando BlobServiceClient con container: " + containerName);
         this.blobServiceClient = new BlobServiceClientBuilder()
                                     .connectionString(connectionString)
                                     .buildClient();
@@ -33,6 +34,7 @@ public class UploadFileService {
                 if (!containerClient.exists()) {
                     System.out.println("Contenedor no existe. Creando contenedor: " + containerName);
                     containerClient.create();
+                    System.out.println("Contenedor creado exitosamente.");
                 } else {
                     System.out.println("Contenedor existe: " + containerName);
                 }
@@ -40,17 +42,27 @@ public class UploadFileService {
                 // Generar un nombre único para el archivo
                 String fileName = UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
                 System.out.println("Nombre del archivo generado: " + fileName);
+                System.out.println("Tamaño del archivo: " + file.getSize() + " bytes");
+                
                 BlobClient blobClient = containerClient.getBlobClient(fileName);
+                System.out.println("Blob URL antes de la subida: " + blobClient.getBlobUrl());
 
                 // Subir el archivo al blob
                 try (InputStream dataStream = file.getInputStream()) {
-                    System.out.println("Subiendo archivo al blob...");
+                    System.out.println("Iniciando subida del archivo al blob...");
                     blobClient.upload(dataStream, file.getSize(), true);
                     System.out.println("Archivo subido con éxito.");
                 } catch (Exception uploadEx) {
                     System.err.println("Error durante la subida del archivo:");
                     uploadEx.printStackTrace();
                     throw uploadEx;
+                }
+
+                // Verificar si el blob existe después de la subida
+                if (blobClient.exists()) {
+                    System.out.println("Verificación: El blob existe en el contenedor.");
+                } else {
+                    System.err.println("Verificación: El blob NO existe después de la subida.");
                 }
 
                 // Generar y retornar la URL con SAS token válido por 2 semanas
@@ -62,18 +74,21 @@ public class UploadFileService {
                 ex.printStackTrace();
                 throw ex;
             }
+        } else {
+            System.out.println("El archivo recibido está vacío. Retornando 'default.jpg'.");
         }
         return "default.jpg";
     }
 
     public void deleteImage(String blobName) {
         try {
+            System.out.println("Iniciando eliminación del blob: " + blobName);
             BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(containerName);
             BlobClient blobClient = containerClient.getBlobClient(blobName);
             if (blobClient.exists()) {
-                System.out.println("Eliminando blob: " + blobName);
+                System.out.println("Blob encontrado. Procediendo a eliminarlo...");
                 blobClient.delete();
-                System.out.println("Blob eliminado.");
+                System.out.println("Blob eliminado exitosamente.");
             } else {
                 System.out.println("Blob no existe: " + blobName);
             }
@@ -86,17 +101,24 @@ public class UploadFileService {
 
     private String generateSasToken(BlobClient blobClient) {
         try {
+            System.out.println("Iniciando generación de SAS token...");
             // Definir permisos para el SAS (solo lectura)
             BlobSasPermission sasPermission = new BlobSasPermission().setReadPermission(true);
+            System.out.println("Permiso de lectura establecido en SAS token.");
+
             // Establecer tiempo de expiración a 2 semanas desde ahora
             OffsetDateTime expiryTime = OffsetDateTime.now().plusWeeks(2);
-            System.out.println("Generando SAS token con expiración en: " + expiryTime);
+            System.out.println("Tiempo de expiración establecido a: " + expiryTime);
+
             // Construir el SAS token
             BlobServiceSasSignatureValues sasValues = new BlobServiceSasSignatureValues(expiryTime, sasPermission)
                     .setProtocol(SasProtocol.HTTPS_ONLY);
             String sasToken = blobClient.generateSas(sasValues);
             System.out.println("SAS token generado: " + sasToken);
-            return blobClient.getBlobUrl() + "?" + sasToken;
+
+            String finalUrl = blobClient.getBlobUrl() + "?" + sasToken;
+            System.out.println("URL final del blob con SAS token: " + finalUrl);
+            return finalUrl;
         } catch (Exception ex) {
             System.err.println("Error en generateSasToken:");
             ex.printStackTrace();
