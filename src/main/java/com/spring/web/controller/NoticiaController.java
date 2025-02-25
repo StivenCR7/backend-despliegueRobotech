@@ -70,9 +70,19 @@ public class NoticiaController {
                 noticiaExistente.setDescripcion(descripcion);
 
                 if (file != null && !file.isEmpty()) {
-                    // Subimos la nueva imagen y actualizamos la URL en la noticia.
-                    String imagenUrl = img.saveImage(file);
-                    noticiaExistente.setImagen(imagenUrl);
+                    // 🔥 Eliminar la imagen anterior antes de subir la nueva
+                    if (noticiaExistente.getImagen() != null && !noticiaExistente.getImagen().isEmpty()) {
+                        String oldBlobUrl = noticiaExistente.getImagen();
+                        String oldBlobName = oldBlobUrl.substring(oldBlobUrl.lastIndexOf("/") + 1);
+                        if (oldBlobName.contains("?")) {
+                            oldBlobName = oldBlobName.substring(0, oldBlobName.indexOf("?"));
+                        }
+                        img.deleteImage(oldBlobName);
+                    }
+
+                    // 🆕 Subimos la nueva imagen y actualizamos la URL en la noticia.
+                    String nuevaImagenUrl = img.saveImage(file);
+                    noticiaExistente.setImagen(nuevaImagenUrl);
                 }
 
                 Noticias noticiaGuardada = noticiaService.guardarNoticia(noticiaExistente);
@@ -84,18 +94,18 @@ public class NoticiaController {
         }).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> eliminarNoticia(@PathVariable Long id) {
         return noticiaService.obtenerNoticiaPorId(id).map(noticia -> {
             try {
                 if (noticia.getImagen() != null && !noticia.getImagen().isEmpty()) {
-                    // Si la URL de la imagen contiene el SAS token, extraemos solo el nombre del blob.
+                    // Extraer el nombre del archivo desde la URL
                     String blobUrl = noticia.getImagen();
                     String blobName = blobUrl.substring(blobUrl.lastIndexOf("/") + 1);
                     if (blobName.contains("?")) {
                         blobName = blobName.substring(0, blobName.indexOf("?"));
                     }
-                    // Llamamos al método de eliminación de imagen en Azure
                     img.deleteImage(blobName);
                 }
 
