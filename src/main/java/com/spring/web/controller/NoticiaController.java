@@ -38,25 +38,21 @@ public class NoticiaController {
 
     @PostMapping("/add")
     public ResponseEntity<Noticias> crearNoticia(
-            @RequestParam("titulo") String titulo,
-            @RequestParam("descripcion") String descripcion,
-            @RequestParam("imagen") MultipartFile file) {
+        @RequestParam("titulo") String titulo,
+        @RequestParam("descripcion") String descripcion,
+        @RequestParam("imagen") MultipartFile file) {
 
-        try {
-            Noticias noticia = new Noticias();
-            // Aquí se sube la imagen a Azure Blob Storage y se obtiene la URL completa con SAS token.
-            String imagenUrl = img.saveImage(file);
-            noticia.setImagen(imagenUrl);
-            noticia.setTitulo(titulo);
-            noticia.setDescripcion(descripcion);
+    // Crear la noticia y subir la imagen a Azure Blob Storage
+    Noticias noticia = new Noticias();
+    String imagenUrl = img.saveImage(file);
+    noticia.setImagen(imagenUrl);
+    noticia.setTitulo(titulo);
+    noticia.setDescripcion(descripcion);
 
-            Noticias nuevaNoticia = noticiaService.guardarNoticia(noticia);
-            return ResponseEntity.status(HttpStatus.CREATED).body(nuevaNoticia);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
+    Noticias nuevaNoticia = noticiaService.guardarNoticia(noticia);
+    return ResponseEntity.status(HttpStatus.CREATED).body(nuevaNoticia);
+}
+
 
     @PutMapping("/update/{id}")
     public ResponseEntity<?> actualizarNoticia(
