@@ -47,12 +47,11 @@ public class UploadFileService {
                     System.out.println("Subiendo archivo al blob...");
                     blobClient.upload(dataStream, file.getSize(), true);
                     System.out.println("Archivo subido con éxito.");
+                } catch (Exception uploadEx) {
+                    System.err.println("Error durante la subida del archivo:");
+                    uploadEx.printStackTrace();
+                    throw uploadEx;
                 }
-
-                // Opción de prueba: retornar la URL sin SAS token (descomentar para testear)
-                // String blobUrl = blobClient.getBlobUrl();
-                // System.out.println("Blob URL sin SAS: " + blobUrl);
-                // return blobUrl;
 
                 // Generar y retornar la URL con SAS token válido por 2 semanas
                 String sasUrl = generateSasToken(blobClient);
@@ -89,8 +88,9 @@ public class UploadFileService {
         try {
             // Definir permisos para el SAS (solo lectura)
             BlobSasPermission sasPermission = new BlobSasPermission().setReadPermission(true);
-            // Establecer tiempo de expiración a 2 semanas
+            // Establecer tiempo de expiración a 2 semanas desde ahora
             OffsetDateTime expiryTime = OffsetDateTime.now().plusWeeks(2);
+            System.out.println("Generando SAS token con expiración en: " + expiryTime);
             // Construir el SAS token
             BlobServiceSasSignatureValues sasValues = new BlobServiceSasSignatureValues(expiryTime, sasPermission)
                     .setProtocol(SasProtocol.HTTPS_ONLY);
