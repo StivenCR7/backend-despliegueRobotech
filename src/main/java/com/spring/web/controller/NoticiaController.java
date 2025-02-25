@@ -14,7 +14,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/noticias")
-@CrossOrigin
 public class NoticiaController {
 
     private final NoticiaServices noticiaService;
@@ -44,7 +43,6 @@ public class NoticiaController {
                 noticia.setImagen(imagenUrlConSas);
             }
         }
-
         return noticias;
     }
 
