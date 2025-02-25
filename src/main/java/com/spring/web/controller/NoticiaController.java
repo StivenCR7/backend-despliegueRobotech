@@ -40,7 +40,7 @@ public class NoticiaController {
     public ResponseEntity<Noticias> crearNoticia(
         @RequestParam("titulo") String titulo,
         @RequestParam("descripcion") String descripcion,
-        @RequestParam("imagen") MultipartFile file) {
+        @RequestParam("imagen") MultipartFile file) throws IOException {
 
     // Crear la noticia y subir la imagen a Azure Blob Storage
     Noticias noticia = new Noticias();
