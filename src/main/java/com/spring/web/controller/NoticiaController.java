@@ -46,6 +46,7 @@ public class NoticiaController {
             Noticias noticia = new Noticias();
             // Aquí se sube la imagen a Azure Blob Storage y se obtiene la URL completa con SAS token.
             String imagenUrl = img.saveImage(file);
+            System.out.println("URL de imagen: " + imagenUrl);
             noticia.setImagen(imagenUrl);
             noticia.setTitulo(titulo);
             noticia.setDescripcion(descripcion);
