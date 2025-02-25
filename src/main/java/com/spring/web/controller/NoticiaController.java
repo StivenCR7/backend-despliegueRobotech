@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -35,24 +34,27 @@ public class NoticiaController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
-
     @PostMapping("/add")
     public ResponseEntity<Noticias> crearNoticia(
-        @RequestParam("titulo") String titulo,
-        @RequestParam("descripcion") String descripcion,
-        @RequestParam("imagen") MultipartFile file) throws IOException {
+            @RequestParam("titulo") String titulo,
+            @RequestParam("descripcion") String descripcion,
+            @RequestParam("imagen") MultipartFile file) {
 
-    // Crear la noticia y subir la imagen a Azure Blob Storage
-    Noticias noticia = new Noticias();
-    String imagenUrl = img.saveImage(file);
-    noticia.setImagen(imagenUrl);
-    noticia.setTitulo(titulo);
-    noticia.setDescripcion(descripcion);
+        try {
+            Noticias noticia = new Noticias();
+            // Aquí se sube la imagen a Azure Blob Storage y se obtiene la URL completa con SAS token.
+            String imagenUrl = img.saveImage(file);
+            noticia.setImagen(imagenUrl);
+            noticia.setTitulo(titulo);
+            noticia.setDescripcion(descripcion);
 
-    Noticias nuevaNoticia = noticiaService.guardarNoticia(noticia);
-    return ResponseEntity.status(HttpStatus.CREATED).body(nuevaNoticia);
-}
-
+            Noticias nuevaNoticia = noticiaService.guardarNoticia(noticia);
+            return ResponseEntity.status(HttpStatus.CREATED).body(nuevaNoticia);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
     @PutMapping("/update/{id}")
     public ResponseEntity<?> actualizarNoticia(
