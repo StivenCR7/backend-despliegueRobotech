@@ -34,10 +34,14 @@ public class UploadFileService {
 	}
 
 	// Método para eliminar archivos
-	public void deleteImage(String fileName) {
-		BlobClient blobClient = containerClient.getBlobClient(fileName);
-		blobClient.delete();
-	}
+    	public void deleteImage(String fileName) {
+        	BlobClient blobClient = containerClient.getBlobClient(fileName);
+        	if (blobClient.exists()) {
+            	blobClient.delete();
+        	} else {
+            	throw new RuntimeException("El archivo no existe en el almacenamiento de Azure.");
+        	}
+    	}
 
 	private String generateSasToken(BlobClient blobClient) {
 		BlobSasPermission permission = new BlobSasPermission().setReadPermission(true);
