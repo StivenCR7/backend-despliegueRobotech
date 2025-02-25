@@ -1,7 +1,5 @@
 package com.spring.web.controller;
 
-import com.azure.storage.blob.BlobClient;
-import com.azure.storage.blob.BlobContainerClient;
 import com.spring.web.model.Noticias;
 import com.spring.web.services.NoticiaServices;
 import com.spring.web.services.UploadFileService;
@@ -14,36 +12,21 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/noticias")
+@CrossOrigin
 public class NoticiaController {
 
     private final NoticiaServices noticiaService;
     private final UploadFileService img;
-    private final BlobContainerClient containerClient;
 
    
-    public NoticiaController(NoticiaServices noticiaService, UploadFileService img,BlobContainerClient blobClient) {
-    	this.containerClient = blobClient;
+    public NoticiaController(NoticiaServices noticiaService, UploadFileService img) {
         this.noticiaService = noticiaService;
         this.img = img;
     }
 
     @GetMapping("/listar")
     public List<Noticias> listarNoticias() {
-        List<Noticias> noticias = noticiaService.listarNoticias();
-
-        // Generar SAS Token para cada imagen de las noticias
-        for (Noticias noticia : noticias) {
-            if (noticia.getImagen() != null && !noticia.getImagen().isEmpty()) {
-                // Crear BlobClient a partir del nombre del archivo o la URL
-                String blobName = noticia.getImagen().substring(noticia.getImagen().lastIndexOf("/") + 1); // Extrae el nombre del archivo
-                BlobClient blobClient = containerClient.getBlobClient(blobName);
-
-                // Generar la URL con SAS Token para cada imagen
-                String imagenUrlConSas = img.generateSasToken(blobClient);
-                noticia.setImagen(imagenUrlConSas);
-            }
-        }
-        return noticias;
+        return noticiaService.listarNoticias();
     }
 
     @GetMapping("/obtener/{id}")
