@@ -43,9 +43,9 @@ public class UploadFileService {
         	}
     	}
 
-	public String generateSasToken(BlobClient blobClient) {
+	private String generateSasToken(BlobClient blobClient) {
 		BlobSasPermission permission = new BlobSasPermission().setReadPermission(true);
-		OffsetDateTime expiryTime = OffsetDateTime.now(ZoneOffset.UTC).plusHours(4); // Expira en 4 hora
+		OffsetDateTime expiryTime = OffsetDateTime.now(ZoneOffset.UTC).plusHours(1); // Expira en 4 hora
 
 		BlobServiceSasSignatureValues values = new BlobServiceSasSignatureValues(expiryTime, permission)
 				.setStartTime(OffsetDateTime.now(ZoneOffset.UTC)).setProtocol(SasProtocol.HTTPS_ONLY);
