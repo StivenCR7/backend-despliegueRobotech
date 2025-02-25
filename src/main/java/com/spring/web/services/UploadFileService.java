@@ -4,7 +4,6 @@ import com.azure.storage.blob.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.util.UUID;
 
@@ -23,7 +22,7 @@ public class UploadFileService {
     }
 
     // Método para subir archivos
-    public String uploadFile(MultipartFile file) throws IOException {
+    public String saveImage(MultipartFile file) throws IOException {
         String fileName = UUID.randomUUID() + "-" + file.getOriginalFilename();
         BlobClient blobClient = containerClient.getBlobClient(fileName);
         blobClient.upload(file.getInputStream(), file.getSize(), true);
@@ -31,7 +30,7 @@ public class UploadFileService {
     }
 
     // Método para eliminar archivos
-    public void deleteFile(String fileName) {
+    public void deleteImage(String fileName) {
         BlobClient blobClient = containerClient.getBlobClient(fileName);
         blobClient.delete();
     }
