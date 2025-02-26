@@ -42,10 +42,9 @@ public class UploadFileService {
             	throw new RuntimeException("El archivo no existe en el almacenamiento de Azure.");
         	}
     	}
-
 	private String generateSasToken(BlobClient blobClient) {
 		BlobSasPermission permission = new BlobSasPermission().setReadPermission(true);
-		OffsetDateTime expiryTime = OffsetDateTime.now(ZoneOffset.UTC).plusHours(1); // Expira en 4 hora
+		OffsetDateTime expiryTime = OffsetDateTime.now(ZoneOffset.UTC).plusDays(14); // Expira en 2 semanas
 
 		BlobServiceSasSignatureValues values = new BlobServiceSasSignatureValues(expiryTime, permission)
 				.setStartTime(OffsetDateTime.now(ZoneOffset.UTC)).setProtocol(SasProtocol.HTTPS_ONLY);
