@@ -99,7 +99,7 @@ encuentro.setResultado(null);
                 .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
 
         // Obtener el estado "Aprobado" por su nombre
-        Estados estadoAprobado = estadorepository.findByNombre("Aprobado");
+        Estados estadoAprobado = estadorepository.findByNombre("aprobado");
         if (estadoAprobado == null) {
             throw new RuntimeException("Estado 'Aprobado' no encontrado");
         }
